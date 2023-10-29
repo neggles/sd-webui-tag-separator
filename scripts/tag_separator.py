@@ -38,6 +38,8 @@ class SepCharacter(str, Enum):
 class TagSeparator(scripts.Script):
     is_txt2img: bool = False
 
+    SepCharacter = SepCharacter
+
     def title(self):
         return extn_name
 
@@ -59,11 +61,11 @@ class TagSeparator(scripts.Script):
                     description="Process negative prompt as well",
                     elem_id=f"{elem_pfx}_neg_enabled",
                 )
-                ignoreCaps = gr.Checkbox(
+                ignore_caps = gr.Checkbox(
                     label="Ignore Meta Tags",
                     value=True,
                     description="Ignores tags in all caps, used for special keywords such as BREAK and AND",
-                    elem_id=f"{elem_pfx}_ignoreCaps",
+                    elem_id=f"{elem_pfx}_ignore_caps",
                 )
                 tag_sep = gr.Dropdown(
                     choices=[x.name for x in SepCharacter],
@@ -78,7 +80,7 @@ class TagSeparator(scripts.Script):
                     elem_id=f"{elem_pfx}_word_sep",
                 )
 
-        return [enabled, tag_sep, word_sep, neg_enabled, ignoreCaps]
+        return [enabled, tag_sep, word_sep, neg_enabled, ignore_caps]
 
     def process(
         self,
@@ -87,7 +89,7 @@ class TagSeparator(scripts.Script):
         tag_sep: str,
         word_sep: str,
         neg_enabled: bool,
-        ignoreCaps: bool,
+        ignore_caps: bool,
     ):
         if enabled is not True:
             return
@@ -105,7 +107,7 @@ class TagSeparator(scripts.Script):
             processed_tags = []
 
             prompt_blocks = [x.strip() for x in re_lora.sub(r",\1,", prompt).split(",") if len(x.strip()) > 0]
-            if ignoreCaps:
+            if ignore_caps:
                 for block in prompt_blocks:
                     if block.startswith("<") and block.endswith(">"):
                         # if LoRA block, ignore
@@ -180,3 +182,11 @@ class TagSeparator(scripts.Script):
             p.extra_generation_params["TagSep Negative"] = orig_pos_prompt
 
         logger.info(f"{extn_name} processing done.")
+
+
+try:
+    from scripts import xyz_grid_tag_separator
+
+    xyz_grid_tag_separator.initialize(TagSeparator)
+except Exception:
+    logger.exception(f"Failed to initialize {extn_name} XYZ extension")
