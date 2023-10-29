@@ -1,13 +1,10 @@
-from enum import Enum
 import logging
 import re
+from enum import Enum
 
 import gradio as gr
 from modules import scripts
-from modules.processing import (
-    StableDiffusionProcessing,
-    StableDiffusionProcessingTxt2Img,
-)
+from modules.processing import StableDiffusionProcessing, StableDiffusionProcessingTxt2Img
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -17,6 +14,8 @@ elem_pfx = "fkcommas"
 
 re_spaces = re.compile(r" {2,}", re.I + re.M)
 re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
+re_all_caps = re.compile(r"(\b[\.\-_\']*[A-Z]+[\.\-_\']*[A-Z]*[\.\-_\']*\b)")
+re_lora = re.compile(r"((<.*?>))", re.I + re.M)
 
 
 class SepCharacter(str, Enum):
@@ -56,6 +55,12 @@ class TagSeparator(scripts.Script):
                     description="Process negative prompt as well",
                     elem_id=f"{elem_pfx}_neg_enabled",
                 )
+                ignoreCaps = gr.Checkbox(
+                    label="Ignore Meta Tags",
+                    value=True,
+                    description="Ignores tags in all caps, used for special keywords such as BREAK and AND",
+                    elem_id=f"{elem_pfx}_ignoreCaps",
+                )
                 tag_sep = gr.Dropdown(
                     choices=[x.name for x in SepCharacter],
                     label=extn_name,
@@ -69,10 +74,16 @@ class TagSeparator(scripts.Script):
                     elem_id=f"{elem_pfx}_word_sep",
                 )
 
-        return [enabled, tag_sep, word_sep, neg_enabled]
+        return [enabled, tag_sep, word_sep, neg_enabled, ignoreCaps]
 
     def process(
-        self, p: StableDiffusionProcessing, enabled: bool, tag_sep: str, word_sep: str, neg_enabled: bool
+        self,
+        p: StableDiffusionProcessing,
+        enabled: bool,
+        tag_sep: str,
+        word_sep: str,
+        neg_enabled: bool,
+        ignoreCaps: bool,
     ):
         if enabled is not True:
             return
@@ -88,20 +99,20 @@ class TagSeparator(scripts.Script):
             # build tag list
             prompt_tags = []
 
-            # check for BREAK meta-tag
-            if "BREAK" in prompt:
-                # split prompt into blocks separated by BREAKs
-                prompt_blocks = [x.strip() for x in prompt.split("BREAK")]
+            prompt_blocks = [x.strip() for x in re.sub(re_lora, r",\1,", prompt).split(",")]
+
+            if ignoreCaps:
                 for block in prompt_blocks:
-                    # split each block into tags separated by commas and add to the list
-                    prompt_tags.extend([x.strip() for x in block.split(",")])
-                    # add a BREAK tag after each block
-                    prompt_tags.append("BREAK")
-                # pop the last BREAK tag since we don't need it
-                prompt_tags.pop()
+                    # first check if the block is a lora
+                    if block.startswith("<") and block.endswith(">"):
+                        # if it is, ignore it
+                        prompt_tags.append(block)
+                        continue
+                    # if it's not, check if it's all caps
+                    block = [x.strip() for x in re.sub(re_all_caps, r",\1,", block).split(",")]
+                    prompt_tags.extend(block)
             else:
-                # only have one block, split it into tags separated by commas
-                prompt_tags.extend([x.strip() for x in prompt.split(",")])
+                prompt_tags = prompt_blocks
 
             # replace spaces with the word separator in each tag
             prompt_tags = [x.replace(" ", word_sep_char) for x in prompt_tags]
