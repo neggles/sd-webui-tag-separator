@@ -97,6 +97,8 @@ class TagSeparator(scripts.Script):
                     prompt_tags.extend([x.strip() for x in block.split(",")])
                     # add a BREAK tag after each block
                     prompt_tags.append("BREAK")
+                # pop the last BREAK tag since we don't need it
+                prompt_tags.pop()
             else:
                 # only have one block, split it into tags separated by commas
                 prompt_tags.extend([x.strip() for x in prompt.split(",")])
