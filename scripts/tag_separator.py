@@ -100,7 +100,7 @@ class TagSeparator(scripts.Script):
             prompt_tags = []
             processed_tags = []
 
-            prompt_blocks = [x.strip() for x in re.sub(re_lora, r",\1,", prompt).split(",")]
+            prompt_blocks = [x.strip() for x in re_lora.sub(r",\1,", prompt).split(",") if len(x.strip()) > 0]
             if ignoreCaps:
                 for block in prompt_blocks:
                     if block.startswith("<") and block.endswith(">"):
@@ -111,7 +111,7 @@ class TagSeparator(scripts.Script):
                         prompt_tags.extend(
                             [
                                 x.strip()
-                                for x in re.sub(re_all_caps, r",\1,", block).split(",")
+                                for x in re_all_caps.sub(r",\1,", block).split(",")
                                 if len(x.strip()) > 0
                             ]
                         )
@@ -120,6 +120,7 @@ class TagSeparator(scripts.Script):
 
             # replace spaces with the word separator in each tag
             for tag in prompt_tags:
+                tag = tag.strip()
                 if tag.startswith("<") and tag.endswith(">"):
                     # if LoRA block, ignore
                     processed_tags.append(tag)
