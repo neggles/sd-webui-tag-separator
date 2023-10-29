@@ -1,0 +1,11 @@
+
+div[id^=fkcommas_].gradio-checkbox {
+    display: flex !important;
+    align-items: center !important;
+    max-width: fit-content !important;
+    min-width: fit-content !important;
+}
+
+div[id^=fkcommas_].gradio-checkbox > label {
+    align-self: center;
+}
