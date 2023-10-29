@@ -26,6 +26,7 @@ class SepCharacter(str, Enum):
     Plus = "+"
     Space = " "
     Underscore = "_"
+    Empty = ""  # not recommended
 
     def names(self):
         return [x.name for x in self.__class__]
