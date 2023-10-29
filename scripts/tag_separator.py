@@ -55,7 +55,7 @@ class TagSeparator(scripts.Script):
                     elem_id=f"{elem_pfx}_neg_enabled",
                 )
                 ignoreCaps = gr.Checkbox(
-                    label="Negative",
+                    label="Ignore Meta Tags",
                     value=True,
                     description="Ignores tags in all caps, used for special keywords such as BREAK and AND",
                     elem_id=f"{elem_pfx}_ignoreCaps",
