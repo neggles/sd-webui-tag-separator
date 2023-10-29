@@ -1,12 +1,11 @@
 from enum import Enum
 import logging
+import re
 
 import gradio as gr
 from modules import scripts
 from modules.processing import (
     StableDiffusionProcessing,
-    Processed,
-    process_images,
     StableDiffusionProcessingTxt2Img,
 )
 
@@ -15,6 +14,9 @@ logger.setLevel(logging.INFO)
 
 extn_name = "Tag Separator"
 elem_pfx = "fkcommas"
+
+re_spaces = re.compile(r" {2,}", re.I + re.M)
+re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
 
 
 class SepCharacter(str, Enum):
@@ -79,7 +81,34 @@ class TagSeparator(scripts.Script):
         word_sep_char = SepCharacter[word_sep].value
 
         def rewrite_prompt(prompt: str):
-            return tag_sep_char.join([x.replace(" ", word_sep_char) for x in prompt.split(", ")])
+            # turn newlines, tabs etc. into spaces
+            prompt = re_whitespace.sub(" ", prompt)
+            # strip multiple sequential spaces
+            prompt = re_spaces.sub(" ", prompt)
+            # build tag list
+            prompt_tags = []
+
+            # check for BREAK meta-tag
+            if "BREAK" in prompt:
+                # split prompt into blocks separated by BREAKs
+                prompt_blocks = [x.strip() for x in prompt.split("BREAK")]
+                for block in prompt_blocks:
+                    # split each block into tags separated by commas and add to the list
+                    prompt_tags.extend([x.strip() for x in block.split(",")])
+                    # add a BREAK tag after each block
+                    prompt_tags.append("BREAK")
+            else:
+                # only have one block, split it into tags separated by commas
+                prompt_tags.extend([x.strip() for x in prompt.split(",")])
+
+            # replace spaces with the word separator in each tag
+            prompt_tags = [x.replace(" ", word_sep_char) for x in prompt_tags]
+            # join tags with the tag separator
+            prompt = tag_sep_char.join(prompt_tags)
+            # strip multiple sequential spaces again just in case
+            prompt = re_spaces.sub(" ", prompt).strip()
+            # return the rewritten prompt
+            return prompt
 
         # check if we're doing t2i with HR
         is_t2i = isinstance(p, StableDiffusionProcessingTxt2Img)
