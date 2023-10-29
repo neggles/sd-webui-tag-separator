@@ -140,6 +140,9 @@ class TagSeparator(scripts.Script):
         if word_sep_char == tag_sep_char:
             logger.warning("Using the same character for word and tag separators is not recommended!")
 
+        orig_pos_prompt = p.all_prompts[0]
+        orig_neg_prompt = p.all_negative_prompts[0]
+
         batch_size = p.batch_size
         for b_idx in range(p.n_iter):
             for s_offs in range(batch_size):
@@ -165,5 +168,10 @@ class TagSeparator(scripts.Script):
                         p.all_hr_negative_prompts[s_idx] = s_hr_neg_prompt
                         if s_hr_neg_prompt != s_neg_prompt:
                             logger.debug(f"[B{b_idx:02d}][I{s_offs:02d}] HR neg prompt: {s_hr_neg_prompt}")
+
+        # save original prompt (only for image 0)
+        p.extra_generation_params["TagSep Prompt"] = orig_pos_prompt
+        if neg_enabled:
+            p.extra_generation_params["TagSep Negative"] = orig_pos_prompt
 
         logger.info(f"{extn_name} processing done.")
