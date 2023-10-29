@@ -96,28 +96,38 @@ class TagSeparator(scripts.Script):
             prompt = re_whitespace.sub(" ", prompt)
             # strip multiple sequential spaces
             prompt = re_spaces.sub(" ", prompt)
-            # build tag list
+            # storage for tag lists
             prompt_tags = []
+            processed_tags = []
 
             prompt_blocks = [x.strip() for x in re.sub(re_lora, r",\1,", prompt).split(",")]
-
             if ignoreCaps:
                 for block in prompt_blocks:
-                    # first check if the block is a lora
                     if block.startswith("<") and block.endswith(">"):
-                        # if it is, ignore it
+                        # if LoRA block, ignore
                         prompt_tags.append(block)
-                        continue
-                    # if it's not, check if it's all caps
-                    block = [x.strip() for x in re.sub(re_all_caps, r",\1,", block).split(",")]
-                    prompt_tags.extend(block)
+                    else:
+                        # otherwise, split by comma (wrapping ALLCAPS words in commas)
+                        prompt_tags.extend(
+                            [
+                                x.strip()
+                                for x in re.sub(re_all_caps, r",\1,", block).split(",")
+                                if len(x.strip()) > 0
+                            ]
+                        )
             else:
                 prompt_tags = prompt_blocks
 
             # replace spaces with the word separator in each tag
-            prompt_tags = [x.replace(" ", word_sep_char) for x in prompt_tags]
+            for tag in prompt_tags:
+                if tag.startswith("<") and tag.endswith(">"):
+                    # if LoRA block, ignore
+                    processed_tags.append(tag)
+                else:
+                    processed_tags.append(tag.replace(" ", word_sep_char))
+
             # join tags with the tag separator
-            prompt = tag_sep_char.join(prompt_tags)
+            prompt = tag_sep_char.join(processed_tags)
             # strip multiple sequential spaces again just in case
             prompt = re_spaces.sub(" ", prompt).strip()
             # return the rewritten prompt
