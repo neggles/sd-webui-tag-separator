@@ -15,6 +15,7 @@ elem_pfx = "fkcommas"
 re_spaces = re.compile(r" {2,}", re.I + re.M)
 re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
 re_all_caps = re.compile(r"(\b[\.\-_\']*[A-Z]+[\.\-_\']*[A-Z]*[\.\-_\']*\b)")
+re_lora = re.compile(r"((<.*?>))", re.I + re.M)
 
 
 class SepCharacter(str, Enum):
@@ -98,8 +99,20 @@ class TagSeparator(scripts.Script):
             # build tag list
             prompt_tags = []
 
+            prompt_blocks = [x.strip() for x in re.sub(re_lora, r",\1,", prompt).split(",")]
+
             if ignoreCaps:
-                prompt_tags = [x.strip() for x in re.sub(re_all_caps, r",\1,", prompt).split(",")]
+                for block in prompt_blocks:
+                    # first check if the block is a lora
+                    if block.startswith("<") and block.endswith(">"):
+                        # if it is, ignore it
+                        prompt_tags.append(block)
+                        continue
+                    # if it's not, check if it's all caps
+                    block = [x.strip() for x in re.sub(re_all_caps, r",\1,", block).split(",")]
+                    prompt_tags.extend(block)
+            else:
+                prompt_tags = prompt_blocks
 
             # replace spaces with the word separator in each tag
             prompt_tags = [x.replace(" ", word_sep_char) for x in prompt_tags]
