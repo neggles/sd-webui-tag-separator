@@ -19,10 +19,13 @@ re_lora = re.compile(r"((<.*?>))", re.I + re.M)
 
 
 class SepCharacter(str, Enum):
-    Space = " "
-    Dash = "-"
-    Underscore = "_"
+    Backslash = "\\"
     Comma = ","
+    Dash = "-"
+    Equals = "="
+    Plus = "+"
+    Space = " "
+    Underscore = "_"
 
     def names(self):
         return [x.name for x in self.__class__]
