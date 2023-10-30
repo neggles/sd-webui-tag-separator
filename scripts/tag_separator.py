@@ -3,7 +3,7 @@ import re
 from enum import Enum
 
 import gradio as gr
-from modules import scripts, script_callbacks
+from modules import script_callbacks, scripts
 from modules.processing import StableDiffusionProcessing, StableDiffusionProcessingTxt2Img
 
 logger = logging.getLogger("tag_sep")
@@ -28,11 +28,20 @@ re_lora = re.compile(r"((<.*?>))", re.I + re.M)
 class SepCharacter(str, Enum):
     Backslash = "\\"
     Comma = ","
+    CommaSpace = ", "
     Dash = "-"
     Equals = "="
     Plus = "+"
+    Slash = "/"
     Space = " "
     Underscore = "_"
+    At = "@"
+    Hash = "#"
+    Percent = "%"
+    Ampersand = "&"
+    Asterisk = "*"
+    Caret = "^"
+    Tilde = "~"
     Empty = ""  # not recommended
 
     @classmethod
