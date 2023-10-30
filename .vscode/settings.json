@@ -20,7 +20,7 @@
     }
   },
   "python.autoComplete.extraPaths": [
-    "./",
+    ".",
     "../..",
     "../../scripts",
     "../../repositories/k-diffusion",
@@ -28,7 +28,7 @@
     "../../repositories/stable-diffusion-stability-ai"
   ],
   "python.analysis.extraPaths": [
-    "${workspaceFolder}",
+    ".",
     "../..",
     "../../scripts",
     "../../repositories/k-diffusion",
@@ -36,6 +36,8 @@
     "../../repositories/stable-diffusion-stability-ai"
   ],
   "black-formatter.args": [ "--line-length=110" ],
+  "ruff.lint.args": [ "--line-length=110", "--target-version=py310" ],
+  "ruff.format.args": [ "--line-length=110", "--target-version=py310" ],
 
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

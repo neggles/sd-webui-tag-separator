@@ -3,14 +3,21 @@ import re
 from enum import Enum
 
 import gradio as gr
-from modules import scripts
+from modules import scripts, script_callbacks
 from modules.processing import StableDiffusionProcessing, StableDiffusionProcessingTxt2Img
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("tag_sep")
 logger.setLevel(logging.INFO)
 
 extn_name = "Tag Separator"
-elem_pfx = "fkcommas"
+extn_id = "tag_sep"
+
+try:
+    from scripts import xyz_grid_tag_separator
+except ImportError as e:
+    logger.error(f"Failed to import Tag Separator XYZ grid support module: {e}")
+    xyz_grid_tag_separator = None
+
 
 re_spaces = re.compile(r" {2,}", re.I + re.M)
 re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
@@ -28,15 +35,20 @@ class SepCharacter(str, Enum):
     Underscore = "_"
     Empty = ""  # not recommended
 
-    def names(self):
-        return [x.name for x in self.__class__]
+    @classmethod
+    def names(cls):
+        return [x.name for x in cls]
 
-    def values(self):
-        return [x.value for x in self.__class__]
+    @classmethod
+    def values(cls):
+        return [x.value for x in cls]
 
 
 class TagSeparator(scripts.Script):
     is_txt2img: bool = False
+
+    sep_names = SepCharacter.names()
+    sep_values = SepCharacter.values()
 
     def title(self):
         return extn_name
@@ -46,48 +58,48 @@ class TagSeparator(scripts.Script):
 
     def ui(self, is_img2img: bool):
         with gr.Accordion(label=extn_name, open=False):
-            with gr.Row(elem_id=f"{elem_pfx}_row"):
+            with gr.Row(elem_id=f"{extn_id}_row"):
                 enabled = gr.Checkbox(
                     label="Enabled",
                     value=True,
                     description="Enable prompt processing",
-                    elem_id=f"{elem_pfx}_enabled",
+                    elem_id=f"{extn_id}_enabled",
                 )
                 neg_enabled = gr.Checkbox(
                     label="Negative",
                     value=True,
-                    description="Process negative prompt as well",
-                    elem_id=f"{elem_pfx}_neg_enabled",
+                    description="Process negative prompt",
+                    elem_id=f"{extn_id}_neg_enabled",
                 )
-                ignoreCaps = gr.Checkbox(
+                ignore_meta = gr.Checkbox(
                     label="Ignore Meta Tags",
                     value=True,
-                    description="Ignores tags in all caps, used for special keywords such as BREAK and AND",
-                    elem_id=f"{elem_pfx}_ignoreCaps",
+                    description="Ignore meta tags in allcaps (BREAK, AND, etc.)",
+                    elem_id=f"{extn_id}_ignore_meta",
                 )
                 tag_sep = gr.Dropdown(
-                    choices=[x.name for x in SepCharacter],
                     label=extn_name,
                     value=SepCharacter.Space.name,
-                    elem_id=f"{elem_pfx}_tag_sep",
+                    choices=[x.name for x in SepCharacter],
+                    elem_id=f"{extn_id}_tag_sep",
                 )
                 word_sep = gr.Dropdown(
                     label="Word Separator",
-                    choices=[x.name for x in SepCharacter],
                     value=SepCharacter.Dash.name,
-                    elem_id=f"{elem_pfx}_word_sep",
+                    choices=[x.name for x in SepCharacter],
+                    elem_id=f"{extn_id}_word_sep",
                 )
 
-        return [enabled, tag_sep, word_sep, neg_enabled, ignoreCaps]
+        return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep]
 
     def process(
         self,
         p: StableDiffusionProcessing,
         enabled: bool,
+        neg_enabled: bool,
+        ignore_meta: bool,
         tag_sep: str,
         word_sep: str,
-        neg_enabled: bool,
-        ignoreCaps: bool,
     ):
         if enabled is not True:
             return
@@ -102,16 +114,17 @@ class TagSeparator(scripts.Script):
             prompt = re_spaces.sub(" ", prompt)
             # storage for tag lists
             prompt_tags = []
-            processed_tags = []
 
+            # split the prompt on commas, as well as LoRA blocks
             prompt_blocks = [x.strip() for x in re_lora.sub(r",\1,", prompt).split(",") if len(x.strip()) > 0]
-            if ignoreCaps:
+            if ignore_meta:
+                # if ignoring meta tags, we need to split on them (ALLCAPS words) as well
                 for block in prompt_blocks:
                     if block.startswith("<") and block.endswith(">"):
-                        # if LoRA block, ignore
+                        # this is a LoRA block, leave it as is
                         prompt_tags.append(block)
                     else:
-                        # otherwise, split by comma (wrapping ALLCAPS words in commas)
+                        # wrap meta tags in commas, then split by comma again
                         prompt_tags.extend(
                             [
                                 x.strip()
@@ -120,9 +133,11 @@ class TagSeparator(scripts.Script):
                             ]
                         )
             else:
+                # not ignoring meta tags, so just use the blocks as-is
                 prompt_tags = prompt_blocks
 
             # replace spaces with the word separator in each tag
+            processed_tags = []
             for tag in prompt_tags:
                 tag = tag.strip()
                 if tag.startswith("<") and tag.endswith(">"):
@@ -142,6 +157,7 @@ class TagSeparator(scripts.Script):
         is_t2i = isinstance(p, StableDiffusionProcessingTxt2Img)
         hr_enabled = p.enable_hr if is_t2i else False
 
+        logger.info(f"{extn_name} processing... tag sep: '{tag_sep_char}', word sep: '{word_sep_char}'")
         if word_sep_char == tag_sep_char:
             logger.warning("Using the same character for word and tag separators is not recommended!")
 
@@ -177,6 +193,19 @@ class TagSeparator(scripts.Script):
         # save original prompt (only for image 0)
         p.extra_generation_params["TagSep Prompt"] = orig_pos_prompt
         if neg_enabled:
-            p.extra_generation_params["TagSep Negative"] = orig_pos_prompt
+            p.extra_generation_params["TagSep Negative"] = orig_neg_prompt
 
         logger.info(f"{extn_name} processing done.")
+
+
+def before_ui_callback():
+    try:
+        xyz_grid_tag_separator.initialize(TagSeparator)
+    except Exception:
+        logger.exception(f"Failed to initialize {extn_name} XYZ extension")
+
+
+script_callbacks.on_before_ui(before_ui_callback)
+
+# TODO: Implement infotext_pasted_cb to restore the original prompt when loading image meta
+# script_callbacks.on_infotext_pasted(infotext_pasted_cb)
