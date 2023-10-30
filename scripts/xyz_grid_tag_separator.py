@@ -15,7 +15,6 @@ tagsep_class: scripts.Script = None  # TagSeparator scripts.Script class
 
 logger = logging.getLogger("tag_sep")
 logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler())
 
 
 class TagSepArgs(int, Enum):
@@ -40,7 +39,7 @@ def update_script_args(p: StableDiffusionProcessing, value, arg_idx: int):
             arg_num = s.args_from + arg_idx
             prev_val = p.script_args[arg_num]
             p.script_args = edit_tuple(p.script_args, arg_num, value)
-            logger.info(f"Updated {s.title()} arg #{arg_num} from {prev_val} to {value}")
+            logger.debug(f"Updated {s.title()} arg #{arg_num} from {prev_val} to {value}")
             break
 
 

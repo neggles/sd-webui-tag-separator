@@ -10,7 +10,6 @@ from modules.processing import StableDiffusionProcessing, StableDiffusionProcess
 
 logger = logging.getLogger("tag_sep")
 logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler())
 
 extn_name = "Tag Separator"
 extn_id = "tag_sep"
