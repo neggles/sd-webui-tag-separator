@@ -20,7 +20,7 @@
     }
   },
   "python.autoComplete.extraPaths": [
-    "./",
+    ".",
     "../..",
     "../../scripts",
     "../../repositories/k-diffusion",
@@ -28,7 +28,7 @@
     "../../repositories/stable-diffusion-stability-ai"
   ],
   "python.analysis.extraPaths": [
-    "${workspaceFolder}",
+    ".",
     "../..",
     "../../scripts",
     "../../repositories/k-diffusion",
