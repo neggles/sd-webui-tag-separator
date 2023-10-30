@@ -55,9 +55,9 @@ def apply_tag_sep(field: TagSepArgs, is_bool: bool = False):
 def format_value_tag_sep(p, opt: "AxisOption", x):
     opt_label = opt.label.split("]")[1].strip()
     if opt_label == "Enabled":
-        opt_label = f"TagSep Enabled"
+        opt_label = "TagSep Enabled"
     elif opt_label == "Negative":
-        opt_label = f"TagSep Negative"
+        opt_label = "TagSep Negative"
 
     return f"{opt_label}: {x}"
 

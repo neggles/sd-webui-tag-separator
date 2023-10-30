@@ -1,8 +1,6 @@
 import logging
 import re
 from enum import Enum
-from traceback import format_exc
-from sys import stderr
 
 import gradio as gr
 from modules import scripts, script_callbacks
