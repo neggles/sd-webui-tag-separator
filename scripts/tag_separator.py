@@ -43,6 +43,7 @@ class SepCharacter(str, Enum):
     Caret = "^"
     Tilde = "~"
     Empty = ""  # not recommended
+    Unmodified = "U"
 
     @classmethod
     def names(cls):
@@ -110,11 +111,11 @@ class TagSeparator(scripts.Script):
         tag_sep: str,
         word_sep: str,
     ):
-        if enabled is not True:
+        if enabled is not True or (tag_sep == "Unmodified" and word_sep == "Unmodified"):
             return
         # enum back to string
-        tag_sep_char = SepCharacter[tag_sep].value
-        word_sep_char = SepCharacter[word_sep].value
+        tag_sep_char = SepCharacter[tag_sep].value if tag_sep != "Unmodified" else ", "
+        word_sep_char = SepCharacter[word_sep].value if word_sep != "Unmodified" else " "
 
         def rewrite_prompt(prompt: str):
             # turn newlines, tabs etc. into spaces

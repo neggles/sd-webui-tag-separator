@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
-from typing import TYPE_CHECKING
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from modules import scripts
 from modules.processing import StableDiffusionProcessing
@@ -47,6 +47,7 @@ def apply_tag_sep(field: TagSepArgs, is_bool: bool = False):
     def apply_fn(p: StableDiffusionProcessing, x, xs: int):
         if is_bool:
             x = True if x.lower() == "true" else False
+        update_script_args(p, True, TagSepArgs.enabled)  # force enable
         update_script_args(p, x, field.value)
 
     return apply_fn
@@ -72,13 +73,6 @@ def initialize(script_class: scripts.Script):
             # we found the XYZ Grid module
             xyz_grid_mod = script_tuple.module
             # create option list
-            tag_sep_enabled = xyz_grid_mod.AxisOption(
-                label="[TagSep] Enabled",
-                type=str,
-                apply=apply_tag_sep(TagSepArgs.enabled, is_bool=True),
-                choices=xyz_grid_mod.boolean_choice(reverse=True),
-                format_value=format_value_tag_sep,
-            )
             tag_sep_negative = xyz_grid_mod.AxisOption(
                 label="[TagSep] Negative",
                 type=str,
@@ -109,7 +103,7 @@ def initialize(script_class: scripts.Script):
             )
             # Add options to XYZ Grid module
             xyz_grid_mod.axis_options.extend(
-                [tag_sep_enabled, tag_sep_negative, tag_sep_ignore_meta, tag_sep_tag_char, tag_sep_word_char]
+                [tag_sep_negative, tag_sep_ignore_meta, tag_sep_tag_char, tag_sep_word_char]
             )
             # No need to continue searching
             break
