@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json.schemastore.org/prettierrc",
+    "tabWidth": 4,
+    "printWidth": 100,
+    "useTabs": false,
+    "semi": true,
+    "trailingComma": "all",
+    "arrowParens": "always",
+    "jsxSingleQuote": false,
+    "plugins": [ ],
+    "overrides": [
+        {
+            "files": "*.svg",
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": "*.html",
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ]
+}
