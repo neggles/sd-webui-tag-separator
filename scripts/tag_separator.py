@@ -123,6 +123,7 @@ class TagSeparator(scripts.Script):
         ignore_meta: bool,
         tag_sep: str,
         word_sep: str,
+        *args,
     ):
         if enabled is not True or (tag_sep == "Unmodified" and word_sep == "Unmodified"):
             return
