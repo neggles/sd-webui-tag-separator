@@ -185,8 +185,8 @@ class TagSeparator(scripts.Script):
         if word_sep_char == tag_sep_char:
             logger.warning("Using the same character for word and tag separators is not recommended!")
 
-        orig_pos_prompt = p.all_prompts[0]
-        orig_neg_prompt = p.all_negative_prompts[0]
+        orig_pos_prompt = f"{p.all_prompts[0]}"
+        orig_neg_prompt = f"{p.all_negative_prompts[0]}"
 
         batch_size = p.batch_size
         for b_idx in range(p.n_iter):
