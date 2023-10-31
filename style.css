@@ -2,10 +2,20 @@
 div[id^=tag_sep_].gradio-checkbox {
     display: flex !important;
     align-items: center !important;
-    max-width: fit-content !important;
     min-width: fit-content !important;
+    min-width: -moz-fit-content !important;
+    max-width: fit-content !important;
+    max-width: -moz-fit-content !important;
 }
 
 div[id^=tag_sep_].gradio-checkbox > label {
     align-self: center;
+}
+
+button[id^=tag_sep_].gradio-button {
+    min-width: 4em !important;
+    max-width: fit-content !important;
+    max-width: -moz-fit-content !important;
+    margin-left: 1.5em !important;
+    margin-right: 1.5em !important;
 }

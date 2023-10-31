@@ -74,36 +74,43 @@ class TagSeparator(scripts.Script):
                     value=True,
                     description="Enable prompt processing",
                     elem_id=f"{extn_id}_enabled",
+                    scale=1,
                 )
                 neg_enabled = gr.Checkbox(
                     label="Negative",
                     value=True,
                     description="Process negative prompt",
                     elem_id=f"{extn_id}_neg_enabled",
+                    scale=1,
                 )
                 ignore_meta = gr.Checkbox(
                     label="Ignore Meta Tags",
                     value=True,
                     description="Ignore meta tags in allcaps (BREAK, AND, etc.)",
                     elem_id=f"{extn_id}_ignore_meta",
+                    scale=1,
                 )
                 tag_sep = gr.Dropdown(
                     label=extn_name,
                     value=SepCharacter.Space.name,
                     choices=[x.name for x in SepCharacter],
                     elem_id=f"{extn_id}_tag_sep",
+                    scale=3,
                 )
                 word_sep = gr.Dropdown(
                     label="Word Separator",
                     value=SepCharacter.Dash.name,
                     choices=[x.name for x in SepCharacter],
                     elem_id=f"{extn_id}_word_sep",
+                    scale=3,
                 )
                 restore_btn = gr.Button(
-                    label="Restore",
+                    value="Restore",
                     description="Restore original prompt format",
                     elem_id=f"{extn_id}_restore",
+                    size="lg",
                     interactive=True,
+                    scale=1,
                 )
 
         return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep, restore_btn]

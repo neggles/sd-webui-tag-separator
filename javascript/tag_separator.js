@@ -58,6 +58,9 @@ class TagSeparator {
             if (origText == "") {
                 console.info(`No text in ${id} to reverse`);
                 return;
+            } else if (origText.includes(", ")) {
+                console.info(`Input ${id} contains comma-separated tags already`);
+                return;
             }
 
             console.info(`TagSep Input: ${origText}`);
