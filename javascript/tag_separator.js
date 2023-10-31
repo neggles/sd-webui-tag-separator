@@ -20,6 +20,7 @@ class TagSeparator {
         Caret: "^",
         Tilde: "~",
         Empty: "",
+        BREAK: " BREAK ",
         Unmodified: "U",
     };
 

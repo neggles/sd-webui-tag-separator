@@ -43,6 +43,7 @@ class SepCharacter(str, Enum):
     Caret = "^"
     Tilde = "~"
     Empty = ""  # not recommended
+    BREAK = " BREAK "  # are you insane?
     Unmodified = "U"
 
     @classmethod
@@ -52,6 +53,20 @@ class SepCharacter(str, Enum):
     @classmethod
     def values(cls):
         return [x.value for x in cls]
+
+    @classmethod
+    @property
+    def tag_only(cls):
+        return [
+            cls.BREAK.name,
+        ]
+
+    @classmethod
+    @property
+    def word_only(cls):
+        return [
+            cls.Empty.name,
+        ]
 
 
 class TagSeparator(scripts.Script):
@@ -93,14 +108,14 @@ class TagSeparator(scripts.Script):
                 tag_sep = gr.Dropdown(
                     label=extn_name,
                     value=SepCharacter.Space.name,
-                    choices=[x.name for x in SepCharacter],
+                    choices=[x.name for x in SepCharacter if x.name not in SepCharacter.word_only],
                     elem_id=f"{extn_id}_tag_sep",
                     scale=3,
                 )
                 word_sep = gr.Dropdown(
                     label="Word Separator",
                     value=SepCharacter.Dash.name,
-                    choices=[x.name for x in SepCharacter],
+                    choices=[x.name for x in SepCharacter if x.name not in SepCharacter.tag_only],
                     elem_id=f"{extn_id}_word_sep",
                     scale=3,
                 )
