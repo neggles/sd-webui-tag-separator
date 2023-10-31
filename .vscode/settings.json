@@ -1,94 +1,94 @@
 {
-  "editor.insertSpaces": true,
-  "editor.tabSize": 4,
-  "files.trimTrailingWhitespace": true,
-  "editor.rulers": [ 100, 120 ],
-
-  "files.associations": {
-    "*.yaml": "yaml",
-    ".gitignore": "gitignore",
-    ".prettierrc": "json",
-    "requirements*.txt": "pip-requirements"
-  },
-
-  "[python]": {
-    "editor.wordBasedSuggestions": false,
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": true
-    }
-  },
-  "python.autoComplete.extraPaths": [
-    ".",
-    "../..",
-    "../../scripts",
-    "../../repositories/k-diffusion",
-    "../../repositories/generative-models",
-    "../../repositories/stable-diffusion-stability-ai"
-  ],
-  "python.analysis.extraPaths": [
-    ".",
-    "../..",
-    "../../scripts",
-    "../../repositories/k-diffusion",
-    "../../repositories/generative-models",
-    "../../repositories/stable-diffusion-stability-ai"
-  ],
-  "black-formatter.args": [ "--line-length=110" ],
-  "ruff.lint.args": [ "--line-length=110", "--target-version=py310" ],
-  "ruff.format.args": [ "--line-length=110", "--target-version=py310" ],
-
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.insertSpaces": true,
     "editor.tabSize": 4,
-    "editor.detectIndentation": false,
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 4,
-    "editor.detectIndentation": false,
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file"
-  },
+    "files.trimTrailingWhitespace": true,
+    "editor.rulers": [ 100, 120 ],
 
-  "[json]": {
-    "editor.tabSize": 2,
-    "editor.detectIndentation": false,
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file",
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[jsonc]": {
-    "editor.tabSize": 2,
-    "editor.detectIndentation": false,
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file",
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
+    "files.associations": {
+        "*.yaml": "yaml",
+        ".gitignore": "gitignore",
+        ".prettierrc": "json",
+        "requirements*.txt": "pip-requirements"
+    },
 
-  "[yaml]": {
-    "editor.detectIndentation": false,
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file"
-  },
-  "yaml.format.bracketSpacing": true,
-  "yaml.format.proseWrap": "preserve",
-  "yaml.format.singleQuote": false,
-  "yaml.format.printWidth": 110,
+    "[python]": {
+        "editor.wordBasedSuggestions": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "python.autoComplete.extraPaths": [
+        ".",
+        "../..",
+        "../../scripts",
+        "../../repositories/k-diffusion",
+        "../../repositories/generative-models",
+        "../../repositories/stable-diffusion-stability-ai"
+    ],
+    "python.analysis.extraPaths": [
+        ".",
+        "../..",
+        "../../scripts",
+        "../../repositories/k-diffusion",
+        "../../repositories/generative-models",
+        "../../repositories/stable-diffusion-stability-ai"
+    ],
+    "black-formatter.args": [ "--line-length=110" ],
+    "ruff.lint.args": [ "--line-length=110", "--target-version=py310" ],
+    "ruff.format.args": [ "--line-length=110", "--target-version=py310" ],
 
-  "[markdown]": {
-    "files.trimTrailingWhitespace": false
-  },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file"
+    },
 
-  "css.lint.validProperties": [ "dock", "content-align", "content-justify" ],
-  "[css]": {
-    "editor.formatOnSave": true
-  },
+    "[json]": {
+        "editor.tabSize": 2,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+        "editor.tabSize": 2,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
 
-  "remote.autoForwardPorts": false,
-  "remote.autoForwardPortsSource": "process"
+    "[yaml]": {
+        "editor.detectIndentation": false,
+        "editor.tabSize": 2,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file"
+    },
+    "yaml.format.bracketSpacing": true,
+    "yaml.format.proseWrap": "preserve",
+    "yaml.format.singleQuote": false,
+    "yaml.format.printWidth": 110,
+
+    "[markdown]": {
+        "files.trimTrailingWhitespace": false
+    },
+
+    "css.lint.validProperties": [ "dock", "content-align", "content-justify" ],
+    "[css]": {
+        "editor.formatOnSave": true
+    },
+
+    "remote.autoForwardPorts": false,
+    "remote.autoForwardPortsSource": "process"
 }
