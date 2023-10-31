@@ -1,7 +1,4 @@
 class TagSeparator {
-    static t2iToolsSelector = "#txt2img_tools > div";
-    static i2iToolsSelector = "#img2img_tools > div";
-
     static SepCharacter = {
         Backslash: "\\",
         Comma: ",",
@@ -20,7 +17,7 @@ class TagSeparator {
         Caret: "^",
         Tilde: "~",
         Empty: "",
-        BREAK: " BREAK ",
+        BREAK: "BREAK",
         Unmodified: "U",
     };
 
@@ -44,34 +41,45 @@ class TagSeparator {
         };
     }
 
-    static reverseFormat(id, tagSepChar, wordSepChar, autoRefresh = false) {
+    static restoreFormat(id, tagSepChar, wordSepChar, autoRefresh = false) {
         if (tagSepChar == ", " && wordSepChar == " ") {
-            console.info(`No reverse-processing needed for ${id}`);
+            console.info(`TagSep ${id}: no need to restore (default separators), skipping`);
             return;
         }
 
         try {
-            let textArea = gradioApp().getElementById(id).querySelector("textarea");
-
             console.info(`TagSep reversing ${id}, wordSep=${wordSepChar}, tagSep=${tagSepChar}`);
+            let textArea = gradioApp().getElementById(id).querySelector("textarea"),
+                origText = textArea.value,
+                newText = "";
 
-            let origText = textArea.value;
             if (origText == "") {
-                console.info(`No text in ${id} to reverse`);
+                console.info(`TagSep ${id}: no input text, skipping restore`);
                 return;
-            } else if (origText.includes(", ")) {
-                console.info(`Input ${id} contains comma-separated tags already`);
-                return;
+            } else {
+                console.info(`TagSep ${id} Input: ${origText}`);
             }
 
-            console.info(`TagSep Input: ${origText}`);
-            let newText = origText.replaceAll(tagSepChar, ", ").replaceAll(wordSepChar, " ");
-            console.info(`TagSep Output: ${newText}`);
+            if (tagSepChar == ", ") {
+                console.warn(`TagSep: tagSepChar is comma-space, skipping restore`);
+            } else {
+                newText = origText.split(tagSepChar).join(", ");
+            }
+
+            if (wordSepChar == " ") {
+                console.warn(`TagSep: wordSepChar is already space, skipping`);
+            } else {
+                newText = newText
+                    .split(", ")
+                    .map((tag) => tag.replaceAll(wordSepChar, " "))
+                    .join(", ");
+            }
+            console.info(`TagSep ${id} Output: ${newText}`);
             textArea.value = newText;
 
             if (autoRefresh) updateInput(textArea);
         } catch (e) {
-            console.error(`TagSep failed to reverse ${id}: ${e}`);
+            console.error(`TagSep failed to restore ${id}: ${e}`);
             return;
         }
     }
@@ -80,21 +88,18 @@ class TagSeparator {
 onUiLoaded(async () => {
     const restoreButton = TagSeparator.injectRestoreListener({
         onClick: () => {
-            const ids = [
-                "txt2img_prompt",
-                "txt2img_neg_prompt",
-                "img2img_prompt",
-                "img2img_neg_prompt",
-                "hires_prompt",
-                "hires_neg_prompt",
-            ];
+            const pos_ids = ["txt2img_prompt", "img2img_prompt", "hires_prompt"];
+            const neg_ids = ["txt2img_neg_prompt", "img2img_neg_prompt", "hires_neg_prompt"];
             let settings = TagSeparator.getCurrentSettings();
-            if (settings.Enabled) {
-                ids.forEach((id) =>
-                    TagSeparator.reverseFormat(id, settings.TagSep, settings.WordSep, true),
+            if (settings.Enabled)
+                pos_ids.forEach((id) =>
+                    TagSeparator.restoreFormat(id, settings.TagSep, settings.WordSep, true),
                 );
-            }
+            if (settings.Enabled && settings.Negative)
+                neg_ids.forEach((id) =>
+                    TagSeparator.restoreFormat(id, settings.TagSep, settings.WordSep, true),
+                );
         },
     });
-    console.info("TagSep Restore button listener injected");
+    console.debug("TagSep Restore button listener injected");
 });
