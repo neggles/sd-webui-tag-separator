@@ -72,8 +72,8 @@ class SepCharacter(str, Enum):
 class TagSeparator(scripts.Script):
     is_txt2img: bool = False
 
-    sep_names = SepCharacter.names()
-    sep_values = SepCharacter.values()
+    tag_separators = [x for x in SepCharacter.names() if x not in SepCharacter.word_only]
+    word_separators = [x for x in SepCharacter.names() if x not in SepCharacter.tag_only]
 
     def title(self):
         return extn_name
@@ -108,14 +108,14 @@ class TagSeparator(scripts.Script):
                 tag_sep = gr.Dropdown(
                     label=extn_name,
                     value=SepCharacter.Space.name,
-                    choices=[x.name for x in SepCharacter if x.name not in SepCharacter.word_only],
+                    choices=self.tag_separators,
                     elem_id=f"{extn_id}_tag_sep",
                     scale=3,
                 )
                 word_sep = gr.Dropdown(
                     label="Word Separator",
                     value=SepCharacter.Dash.name,
-                    choices=[x.name for x in SepCharacter if x.name not in SepCharacter.tag_only],
+                    choices=self.word_separators,
                     elem_id=f"{extn_id}_word_sep",
                     scale=3,
                 )

@@ -91,14 +91,14 @@ def initialize(script_class: scripts.Script):
                 label="[TagSep] Tag Separator",
                 type=str,
                 apply=apply_tag_sep(TagSepArgs.tag_sep),
-                choices=lambda: tagsep_class.sep_names,
+                choices=lambda: tagsep_class.tag_separators,
                 format_value=format_value_tag_sep,
             )
             tag_sep_word_char = xyz_grid_mod.AxisOption(
                 label="[TagSep] Word Separator",
                 type=str,
                 apply=apply_tag_sep(TagSepArgs.word_sep),
-                choices=lambda: tagsep_class.sep_names,
+                choices=lambda: tagsep_class.word_separators,
                 format_value=format_value_tag_sep,
             )
             # Add options to XYZ Grid module
