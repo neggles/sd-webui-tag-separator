@@ -16,6 +16,9 @@ button[id^=tag_sep_].gradio-button {
     min-width: 4em !important;
     max-width: fit-content !important;
     max-width: -moz-fit-content !important;
-    margin-left: 1.5em !important;
-    margin-right: 1.5em !important;
+    margin-left: 0.5em !important;
+    height: 2.4em;
+    align-self: end;
+    line-height: 1em;
+    border-radius: 0.5em;
 }
