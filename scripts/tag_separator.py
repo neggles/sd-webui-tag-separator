@@ -99,8 +99,14 @@ class TagSeparator(scripts.Script):
                     choices=[x.name for x in SepCharacter],
                     elem_id=f"{extn_id}_word_sep",
                 )
+                restore_btn = gr.Button(
+                    label="Restore",
+                    description="Restore original prompt format",
+                    elem_id=f"{extn_id}_restore",
+                    interactive=True,
+                )
 
-        return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep]
+        return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep, restore_btn]
 
     def process(
         self,
