@@ -68,12 +68,22 @@ class SepCharacter(str, Enum):
             cls.Empty.name,
         ]
 
+    @classmethod
+    @property
+    def tag_separators(cls):
+        return [x for x in cls.names() if x not in cls.word_only]
+
+    @classmethod
+    @property
+    def word_separators(cls):
+        return [x for x in cls.names() if x not in cls.tag_only]
+
 
 class TagSeparator(scripts.Script):
     is_txt2img: bool = False
 
-    tag_separators = [x for x in SepCharacter.names() if x not in SepCharacter.word_only]
-    word_separators = [x for x in SepCharacter.names() if x not in SepCharacter.tag_only]
+    tag_separators = SepCharacter.tag_separators
+    word_separators = SepCharacter.word_separators
 
     def title(self):
         return extn_name
