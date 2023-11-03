@@ -1,8 +1,10 @@
 import logging
 import re
+from copy import deepcopy
 from enum import Enum
 
 import gradio as gr
+from gradio.components import Component
 from modules import script_callbacks, scripts
 from modules.processing import StableDiffusionProcessing, StableDiffusionProcessingTxt2Img
 
@@ -19,10 +21,20 @@ except ImportError as e:
     xyz_grid_tag_separator = None
 
 
+# regexes
 re_spaces = re.compile(r" {2,}", re.I + re.M)
 re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
 re_all_caps = re.compile(r"(\b[\.\-_\']*[A-Z]+[\.\-_\']*[A-Z]*[\.\-_\']*\b)")
 re_lora = re.compile(r"((<.*?>))", re.I + re.M)
+# constants for pnginfo
+TS_POS_ENABLED = "TagSep Enabled"
+TS_NEG_ENABLED = "TagSep Negative"
+TS_IGNORE_META = "TagSep Ignore Meta"
+TS_TAG_SEP = "TagSep Tag Separator"
+TS_WORD_SEP = "TagSep Word Separator"
+
+TS_PROMPT = "TagSep Prompt"
+TS_NEGATIVE = "TagSep Negative"
 
 
 class SepCharacter(str, Enum):
@@ -85,13 +97,15 @@ class TagSeparator(scripts.Script):
     tag_separators = SepCharacter.tag_separators
     word_separators = SepCharacter.word_separators
 
+    infotext_fields: list[tuple[Component, str]] = []
+
     def title(self):
         return extn_name
 
     def show(self, is_img2img: bool):
         return scripts.AlwaysVisible
 
-    def ui(self, is_img2img: bool):
+    def ui(self, is_img2img: bool) -> list[Component]:
         with gr.Accordion(label=extn_name, open=False):
             with gr.Row(elem_id=f"{extn_id}_row"):
                 enabled = gr.Checkbox(
@@ -137,7 +151,15 @@ class TagSeparator(scripts.Script):
                     interactive=True,
                     scale=1,
                 )
-
+        self.infotext_fields.extend(
+            [
+                (enabled, TS_POS_ENABLED),
+                (neg_enabled, TS_NEG_ENABLED),
+                (ignore_meta, TS_IGNORE_META),
+                (tag_sep, TS_TAG_SEP),
+                (word_sep, TS_WORD_SEP),
+            ]
+        )
         return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep, restore_btn]
 
     def process(
@@ -210,8 +232,8 @@ class TagSeparator(scripts.Script):
         if word_sep_char == tag_sep_char:
             logger.warning("Using the same character for word and tag separators is not recommended!")
 
-        orig_pos_prompt = f"{p.all_prompts[0]}"
-        orig_neg_prompt = f"{p.all_negative_prompts[0]}"
+        orig_pos_prompt = deepcopy(p.all_prompts[0])
+        orig_neg_prompt = deepcopy(p.all_negative_prompts[0])
 
         batch_size = p.batch_size
         for b_idx in range(p.n_iter):
@@ -240,23 +262,28 @@ class TagSeparator(scripts.Script):
                             logger.debug(f"[B{b_idx:02d}][I{s_offs:02d}] HR neg prompt: {s_hr_neg_prompt}")
 
         # save original prompt (only for image 0)
-        p.extra_generation_params["TagSep Tag Separator"] = tag_sep
-        p.extra_generation_params["TagSep Word Separator"] = word_sep
-        p.extra_generation_params["TagSep Prompt"] = orig_pos_prompt
+        p.extra_generation_params[TS_PROMPT] = orig_pos_prompt
         if neg_enabled:
-            p.extra_generation_params["TagSep Negative"] = orig_neg_prompt
+            p.extra_generation_params[TS_NEGATIVE] = orig_neg_prompt
 
         logger.info(f"{extn_name} processing done.")
 
 
-def before_ui_callback():
+def before_ui_cb():
     try:
         xyz_grid_tag_separator.initialize(TagSeparator)
     except Exception:
         logger.exception(f"Failed to initialize {extn_name} XYZ extension")
 
 
-script_callbacks.on_before_ui(before_ui_callback)
+def infotext_pasted_cb(prompt: str, params: dict[str, str]):
+    if TS_PROMPT in params:
+        params["Prompt"] = params.get(TS_PROMPT, params["Prompt"])
 
-# TODO: Implement infotext_pasted_cb to restore the original prompt when loading image meta
-# script_callbacks.on_infotext_pasted(infotext_pasted_cb)
+    if TS_NEGATIVE in params:
+        params["Negative prompt"] = params.get(TS_NEGATIVE, params["Negative prompt"])
+
+
+# register callbacks
+script_callbacks.on_before_ui(before_ui_cb)
+script_callbacks.on_infotext_pasted(infotext_pasted_cb)
