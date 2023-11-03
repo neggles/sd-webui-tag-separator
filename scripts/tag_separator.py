@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 from copy import deepcopy
@@ -130,7 +131,7 @@ class TagSeparator(scripts.Script):
                     scale=1,
                 )
                 tag_sep = gr.Dropdown(
-                    label=extn_name,
+                    label="Tag Separator",
                     value=SepCharacter.Space.name,
                     choices=self.tag_separators,
                     elem_id=f"{extn_id}_tag_sep",
@@ -143,7 +144,7 @@ class TagSeparator(scripts.Script):
                     elem_id=f"{extn_id}_word_sep",
                     scale=3,
                 )
-                restore_btn = gr.Button(
+                self.restore_btn = gr.Button(
                     value="Restore",
                     description="Restore original prompt format",
                     elem_id=f"{extn_id}_restore",
@@ -160,7 +161,7 @@ class TagSeparator(scripts.Script):
                 (word_sep, TS_WORD_SEP),
             ]
         )
-        return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep, restore_btn]
+        return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep]
 
     def process(
         self,
