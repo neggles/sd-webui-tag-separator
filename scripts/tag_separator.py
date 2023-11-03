@@ -263,9 +263,9 @@ class TagSeparator(scripts.Script):
                             logger.debug(f"[B{b_idx:02d}][I{s_offs:02d}] HR neg prompt: {s_hr_neg_prompt}")
 
         # save original prompt (only for image 0)
-        p.extra_generation_params[TS_PROMPT] = orig_pos_prompt
+        p.extra_generation_params.setdefault(TS_PROMPT, orig_pos_prompt)
         if neg_enabled:
-            p.extra_generation_params[TS_NEGATIVE] = orig_neg_prompt
+            p.extra_generation_params.setdefault(TS_NEGATIVE, orig_neg_prompt)
 
         logger.info(f"{extn_name} processing done.")
 
