@@ -1,4 +1,3 @@
-import json
 import logging
 import re
 from copy import deepcopy
@@ -67,29 +66,25 @@ class SepCharacter(str, Enum):
     def values(cls):
         return [x.value for x in cls]
 
-    @classmethod
     @property
-    def tag_only(cls):
+    def tag_only(self):
         return [
-            cls.BREAK.name,
+            self.BREAK.name,
         ]
 
-    @classmethod
     @property
-    def word_only(cls):
+    def word_only(self):
         return [
-            cls.Empty.name,
+            self.Empty.name,
         ]
 
-    @classmethod
     @property
-    def tag_separators(cls):
-        return [x for x in cls.names() if x not in cls.word_only]
+    def tag_separators(self):
+        return [x for x in self.names() if x not in self.word_only]
 
-    @classmethod
     @property
-    def word_separators(cls):
-        return [x for x in cls.names() if x not in cls.tag_only]
+    def word_separators(self):
+        return [x for x in self.names() if x not in self.tag_only]
 
 
 class TagSeparator(scripts.Script):
@@ -99,6 +94,7 @@ class TagSeparator(scripts.Script):
     word_separators = SepCharacter.word_separators
 
     infotext_fields: list[tuple[Component, str]] = []
+    paste_field_names: list[str] = []
 
     def title(self):
         return extn_name
@@ -161,6 +157,8 @@ class TagSeparator(scripts.Script):
                 (word_sep, TS_WORD_SEP),
             ]
         )
+        self.paste_field_names.extend([x[1] for x in self.infotext_fields])
+
         return [enabled, neg_enabled, ignore_meta, tag_sep, word_sep]
 
     def process(
