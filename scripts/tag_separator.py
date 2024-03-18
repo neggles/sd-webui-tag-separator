@@ -60,38 +60,38 @@ class SepCharacter(str, Enum):
 
     @classmethod
     def names(cls):
-        return [x.name for x in cls]
+        return [x.name for x in cls.__members__.values()]
 
     @classmethod
     def values(cls):
-        return [x.value for x in cls]
+        return [x.value for x in cls.__members__.values()]
 
-    @property
-    def tag_only(self):
+    @classmethod
+    def tag_only(cls):
         return [
-            self.BREAK.name,
+            cls.BREAK.name,
         ]
 
-    @property
-    def word_only(self):
+    @classmethod
+    def word_only(cls):
         return [
-            self.Empty.name,
+            cls.Empty.name,
         ]
 
-    @property
-    def tag_separators(self):
-        return [x for x in self.names() if x not in self.word_only]
+    @classmethod
+    def tag_separators(cls):
+        return [x for x in cls.names() if x not in cls.word_only()]
 
-    @property
-    def word_separators(self):
-        return [x for x in self.names() if x not in self.tag_only]
+    @classmethod
+    def word_separators(cls):
+        return [x for x in cls.names() if x not in cls.tag_only()]
 
 
 class TagSeparator(scripts.Script):
     is_txt2img: bool = False
 
-    tag_separators = SepCharacter.tag_separators
-    word_separators = SepCharacter.word_separators
+    tag_separators = SepCharacter.tag_separators()
+    word_separators = SepCharacter.word_separators()
 
     infotext_fields: list[tuple[Component, str]] = []
     paste_field_names: list[str] = []
