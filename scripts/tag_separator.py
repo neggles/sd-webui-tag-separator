@@ -22,10 +22,10 @@ except ImportError as e:
 
 
 # regexes
-re_spaces = re.compile(r" {2,}", re.I + re.M)
-re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
+re_spaces = re.compile(r" {2,}", re.IGNORECASE + re.MULTILINE)
+re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.IGNORECASE + re.MULTILINE)
 re_all_caps = re.compile(r"(\b[\.\-_\']*[A-Z]+[\.\-_\']*[A-Z]*[\.\-_\']*\b)")
-re_lora = re.compile(r"((<.*?>))", re.I + re.M)
+re_lora = re.compile(r"((<.*?>))", re.IGNORECASE + re.MULTILINE)
 # constants for pnginfo
 TS_POS_ENABLED = "TagSep Enabled"
 TS_NEG_ENABLED = "TagSep Negative"
@@ -103,51 +103,50 @@ class TagSeparator(scripts.Script):
         return scripts.AlwaysVisible
 
     def ui(self, is_img2img: bool) -> list[Component]:
-        with gr.Accordion(label=extn_name, open=False):
-            with gr.Row(elem_id=f"{extn_id}_row"):
-                enabled = gr.Checkbox(
-                    label="Enabled",
-                    value=True,
-                    description="Enable prompt processing",
-                    elem_id=f"{extn_id}_enabled",
-                    scale=1,
-                )
-                neg_enabled = gr.Checkbox(
-                    label="Negative",
-                    value=True,
-                    description="Process negative prompt",
-                    elem_id=f"{extn_id}_neg_enabled",
-                    scale=1,
-                )
-                ignore_meta = gr.Checkbox(
-                    label="Ignore Meta Tags",
-                    value=True,
-                    description="Ignore meta tags in allcaps (BREAK, AND, etc.)",
-                    elem_id=f"{extn_id}_ignore_meta",
-                    scale=1,
-                )
-                tag_sep = gr.Dropdown(
-                    label="Tag Separator",
-                    value=SepCharacter.Space.name,
-                    choices=self.tag_separators,
-                    elem_id=f"{extn_id}_tag_sep",
-                    scale=3,
-                )
-                word_sep = gr.Dropdown(
-                    label="Word Separator",
-                    value=SepCharacter.Dash.name,
-                    choices=self.word_separators,
-                    elem_id=f"{extn_id}_word_sep",
-                    scale=3,
-                )
-                self.restore_btn = gr.Button(
-                    value="Restore",
-                    description="Restore original prompt format",
-                    elem_id=f"{extn_id}_restore",
-                    size="lg",
-                    interactive=True,
-                    scale=1,
-                )
+        with gr.Accordion(label=extn_name, open=False), gr.Row(elem_id=f"{extn_id}_row"):
+            enabled = gr.Checkbox(
+                label="Enabled",
+                value=True,
+                description="Enable prompt processing",
+                elem_id=f"{extn_id}_enabled",
+                scale=1,
+            )
+            neg_enabled = gr.Checkbox(
+                label="Negative",
+                value=True,
+                description="Process negative prompt",
+                elem_id=f"{extn_id}_neg_enabled",
+                scale=1,
+            )
+            ignore_meta = gr.Checkbox(
+                label="Ignore Meta Tags",
+                value=True,
+                description="Ignore meta tags in allcaps (BREAK, AND, etc.)",
+                elem_id=f"{extn_id}_ignore_meta",
+                scale=1,
+            )
+            tag_sep = gr.Dropdown(
+                label="Tag Separator",
+                value=SepCharacter.Space.name,
+                choices=self.tag_separators,
+                elem_id=f"{extn_id}_tag_sep",
+                scale=3,
+            )
+            word_sep = gr.Dropdown(
+                label="Word Separator",
+                value=SepCharacter.Dash.name,
+                choices=self.word_separators,
+                elem_id=f"{extn_id}_word_sep",
+                scale=3,
+            )
+            self.restore_btn = gr.Button(
+                value="Restore",
+                description="Restore original prompt format",
+                elem_id=f"{extn_id}_restore",
+                size="lg",
+                interactive=True,
+                scale=1,
+            )
         self.infotext_fields.extend(
             [
                 (enabled, TS_POS_ENABLED),
