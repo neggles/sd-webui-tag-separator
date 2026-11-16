@@ -1,11 +1,10 @@
 import re
 from enum import Enum
-from typing import Optional
 
-re_spaces = re.compile(r" {2,}", re.I + re.M)
-re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.I + re.M)
+re_spaces = re.compile(r" {2,}", re.IGNORECASE + re.MULTILINE)
+re_whitespace = re.compile(r"[\t\n\r\f\v]+", re.IGNORECASE + re.MULTILINE)
 re_all_caps = re.compile(r"(\b[\.\-_\']*[A-Z]+[\.\-_\']*[A-Z]*[\.\-_\']*\b)")
-re_lora = re.compile(r"((<.*?>))", re.I + re.M)
+re_lora = re.compile(r"((<.*?>))", re.IGNORECASE + re.MULTILINE)
 
 
 class SepCharacter(str, Enum):
@@ -111,7 +110,7 @@ class TagSeparator:
         ignore_meta: str,
         tag_sep: str,
         word_sep: str,
-        neg_prompt: Optional[str] = None,
+        neg_prompt: str | None = None,
     ):
         ignore_meta = True if ignore_meta == "enable" else False
         tag_sep_char = SepCharacter[tag_sep].value if tag_sep != "Unmodified" else ", "
